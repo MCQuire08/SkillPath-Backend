@@ -1,0 +1,86 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       Int      @id @default(autoincrement())
+  name     String
+  lastName String
+  userName String   @unique
+  password String
+  role     String
+  startDate DateTime @default(now())
+  status   String @default("active")
+  linkImage String
+  plans    Plan[]
+}
+
+model Course {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  duration    Float?
+  categories  CourseCategory[]
+  links       CourseLink[]
+  plans       Plan[]
+}
+
+model Category {
+  id          Int             @id @default(autoincrement())
+  name        String
+  courseCategories CourseCategory[]
+}
+
+model CourseCategory {
+  courseId   Int
+  categoryId Int
+  course     Course   @relation(fields: [courseId], references: [id])
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  @@id([courseId, categoryId])
+}
+
+model CourseLink {
+  courseId Int
+  linkId   Int
+  course   Course @relation(fields: [courseId], references: [id])
+  link     Link   @relation(fields: [linkId], references: [id])
+
+  @@id([courseId, linkId])
+}
+
+model Link {
+  id          Int      @id @default(autoincrement())
+  description String
+  courseLinks CourseLink[]
+}
+
+model Plan {
+  id       Int      @id @default(autoincrement())
+  userId   Int
+  courseId Int
+  progress Int
+  user     User     @relation(fields: [userId], references: [id])
+  course   Course   @relation(fields: [courseId], references: [id])
+  evidences PlanEvidence[]
+}
+
+model Evidence {
+  id   Int      @id @default(autoincrement())
+  link String
+  planEvidences PlanEvidence[]
+}
+
+model PlanEvidence {
+  planId     Int
+  evidenceId Int
+  plan       Plan     @relation(fields: [planId], references: [id])
+  evidence   Evidence @relation(fields: [evidenceId], references: [id])
+
+  @@id([planId, evidenceId])
+}
