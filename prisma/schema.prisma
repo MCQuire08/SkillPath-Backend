@@ -8,16 +8,17 @@ datasource db {
 }
 
 model User {
-  id       Int      @id @default(autoincrement())
-  name     String
-  lastName String
-  userName String   @unique
-  password String
-  role     String
-  startDate DateTime @default(now())
-  status   String @default("active")
+  id        Int       @id @default(autoincrement())
+  name      String
+  lastName  String
+  userName  String    @unique
+  password  String
+  role      String
+  startDate DateTime  @default(now())
+  status    String    @default("active")
   linkImage String
-  plans    Plan[]
+  plans     Plan[]
+  skills    UserSkill[]
 }
 
 model Course {
@@ -31,9 +32,9 @@ model Course {
 }
 
 model Category {
-  id          Int             @id @default(autoincrement())
-  name        String
-  courseCategories CourseCategory[]
+  id                Int             @id @default(autoincrement())
+  name              String
+  courseCategories  CourseCategory[]
 }
 
 model CourseCategory {
@@ -83,4 +84,20 @@ model PlanEvidence {
   evidence   Evidence @relation(fields: [evidenceId], references: [id])
 
   @@id([planId, evidenceId])
+}
+
+model Skill {
+  id    Int       @id @default(autoincrement())
+  name  String    @unique
+  userSkills UserSkill[]
+}
+
+model UserSkill {
+  userId Int
+  skillId Int
+  level  String
+  user   User @relation(fields: [userId], references: [id])
+  skill  Skill @relation(fields: [skillId], references: [id])
+
+  @@id([userId, skillId])
 }
