@@ -7,26 +7,29 @@ const router = Router();
 
 router.post("/user/register", async (req, res) => {
   try {
-    const { name, lastName, password, role, status, linkImage } = req.body;
+    const { name, lastName, password, role, status, linkImage, email, location, university, position } = req.body;
     const hashedPassword = await bcrypt.hash(password, 12);
 
-    const username = `${name
-      .substring(0, 3)
-      .toLowerCase()}${lastName.toLowerCase()}`;
+    const userName = `${name.substring(0, 3).toLowerCase()}${lastName.toLowerCase()}`;
 
     const newUser = {
       name,
       lastName,
-      userName: username,
+      userName,
       password: hashedPassword,
       role,
       status,
       linkImage,
+      email,
+      location,
+      university,
+      position,
     };
 
     const createdUser = await prisma.user.create({
       data: newUser,
     });
+
     const response = {
       id: createdUser.id,
       userName: createdUser.userName,
@@ -127,7 +130,7 @@ router.put("/user/:id", async (req, res) => {
       return res.status(400).json({ error: "ID de usuario no válido" });
     }
 
-    const { name, lastName, password, role, status, linkImage } = req.body;
+    const { name, lastName, password, role, status, linkImage, email, location, university, position } = req.body;
     const updateData = {};
 
     if (name) updateData.name = name;
@@ -136,6 +139,10 @@ router.put("/user/:id", async (req, res) => {
     if (role) updateData.role = role;
     if (status) updateData.status = status;
     if (linkImage) updateData.linkImage = linkImage;
+    if (email) updateData.email = email;
+    if (location) updateData.location = location;
+    if (university) updateData.university = university;
+    if (position) updateData.position = position;
 
     const updatedUser = await prisma.user.update({
       where: {

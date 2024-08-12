@@ -15,8 +15,12 @@ model User {
   password  String
   role      String
   startDate DateTime  @default(now())
-  status    String    @default("active")
+  status    String    @default("Active")
   linkImage String
+  email       String    @unique
+  location    String
+  university  String
+  position    String
   plans     Plan[]
   skills    UserSkill[]
 }

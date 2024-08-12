@@ -6,9 +6,16 @@ CREATE TABLE `User` (
     `userName` VARCHAR(191) NOT NULL,
     `password` VARCHAR(191) NOT NULL,
     `role` VARCHAR(191) NOT NULL,
-    `startDate` DATETIME(3) NOT NULL,
-    `status` VARCHAR(191) NOT NULL,
+    `startDate` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `status` VARCHAR(191) NOT NULL DEFAULT 'Active',
+    `linkImage` VARCHAR(191) NOT NULL,
+    `email` VARCHAR(191) NOT NULL,
+    `location` VARCHAR(191) NOT NULL,
+    `university` VARCHAR(191) NOT NULL,
+    `position` VARCHAR(191) NOT NULL,
 
+    UNIQUE INDEX `User_userName_key`(`userName`),
+    UNIQUE INDEX `User_email_key`(`email`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -80,6 +87,24 @@ CREATE TABLE `PlanEvidence` (
     PRIMARY KEY (`planId`, `evidenceId`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
+-- CreateTable
+CREATE TABLE `Skill` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `name` VARCHAR(191) NOT NULL,
+
+    UNIQUE INDEX `Skill_name_key`(`name`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `UserSkill` (
+    `userId` INTEGER NOT NULL,
+    `skillId` INTEGER NOT NULL,
+    `level` VARCHAR(191) NOT NULL,
+
+    PRIMARY KEY (`userId`, `skillId`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
 -- AddForeignKey
 ALTER TABLE `CourseCategory` ADD CONSTRAINT `CourseCategory_courseId_fkey` FOREIGN KEY (`courseId`) REFERENCES `Course`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
@@ -103,3 +128,9 @@ ALTER TABLE `PlanEvidence` ADD CONSTRAINT `PlanEvidence_planId_fkey` FOREIGN KEY
 
 -- AddForeignKey
 ALTER TABLE `PlanEvidence` ADD CONSTRAINT `PlanEvidence_evidenceId_fkey` FOREIGN KEY (`evidenceId`) REFERENCES `Evidence`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `UserSkill` ADD CONSTRAINT `UserSkill_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `UserSkill` ADD CONSTRAINT `UserSkill_skillId_fkey` FOREIGN KEY (`skillId`) REFERENCES `Skill`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
