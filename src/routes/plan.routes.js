@@ -38,9 +38,7 @@ router.put("/plan/updateProgress/:planId", async (req, res) => {
     const { newProgress } = req.body;
 
     if (isNaN(planId) || newProgress === undefined) {
-      return res
-        .status(400)
-        .json({ error: "ID de plan o nuevo progreso no válido" });
+      return res.status(400).json({ error: "ID de plan o nuevo progreso no válido" });
     }
 
     const updatedPlan = await prisma.plan.update({
@@ -61,12 +59,12 @@ router.put("/plan/updateProgress/:planId", async (req, res) => {
 
 router.post("/plan", async (req, res) => {
   try {
-    const { idCourse, idUser } = req.body;
+    const { courseId, userId } = req.body;
 
     const newPlan = await prisma.plan.create({
       data: {
-        courseId: idCourse,
-        userId: idUser,
+        courseId: parseInt(courseId, 10),
+        userId: parseInt(userId, 10),
         progress: 0,
       },
     });
@@ -88,7 +86,7 @@ router.get("/planEvidence/:idPlan", async (req, res) => {
 
     const planEvidences = await prisma.planEvidence.findMany({
       where: { planId: parseInt(idPlan, 10) },
-      include: { evidence: true },
+      include: { evidence: true }, 
     });
 
     res.json(planEvidences);
@@ -100,12 +98,10 @@ router.get("/planEvidence/:idPlan", async (req, res) => {
 
 router.post("/planEvidence", async (req, res) => {
   try {
-    const { idPlan, link } = req.body;
+    const { planId, link } = req.body;
 
-    if (!idPlan || !link) {
-      return res
-        .status(400)
-        .json({ error: "ID del plan y enlace de la evidencia son requeridos" });
+    if (!planId || !link) {
+      return res.status(400).json({ error: "ID del plan y enlace de la evidencia son requeridos" });
     }
 
     const newEvidence = await prisma.evidence.create({
@@ -114,7 +110,7 @@ router.post("/planEvidence", async (req, res) => {
 
     const newPlanEvidence = await prisma.planEvidence.create({
       data: {
-        planId: parseInt(idPlan, 10),
+        planId: parseInt(planId, 10),
         evidenceId: newEvidence.id,
       },
     });
@@ -125,9 +121,7 @@ router.post("/planEvidence", async (req, res) => {
     });
   } catch (error) {
     console.error("Error al crear evidencia y asociarla con el plan:", error);
-    res
-      .status(500)
-      .json({ error: "Error al crear evidencia y asociarla con el plan" });
+    res.status(500).json({ error: "Error al crear evidencia y asociarla con el plan" });
   }
 });
 

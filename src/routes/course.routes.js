@@ -15,28 +15,20 @@ router.get("/course", async (_req, res) => {
 
 router.post("/course", async (req, res) => {
   try {
-    const { name, description, duration, categoryId } = req.body;
+    const { name, description, duration, link, category } = req.body;
 
     const course = await prisma.course.create({
       data: {
         name,
         description,
         duration,
+        link,
+        category,
       },
     });
 
-    if (categoryId) {
-      await prisma.courseCategory.create({
-        data: {
-          courseId: course.id,
-          categoryId,
-        },
-      });
-    }
-
     const response = {
       course,
-      categoryId: categoryId || null,
     };
 
     res.json(response);
@@ -46,50 +38,19 @@ router.post("/course", async (req, res) => {
   }
 });
 
-router.post("/courseLink", async (req, res) => {
+
+router.get('/link', async (_req, res) => {
   try {
-    const { description, courseId } = req.body;
-
-    if (!description || !courseId) {
-      return res.status(400).json({ error: "Faltan datos necesarios" });
-    }
-
-    const link = await prisma.link.create({
-      data: {
-        description,
-      },
-    });
-
-    const courseLink = await prisma.courseLink.create({
-      data: {
-        courseId: parseInt(courseId, 10),
-        linkId: link.id,
-      },
-    });
-
-    const response = {
-      link,
-      courseLink,
-    };
-
-    res.json(response);
+    const links = await prisma.link.findMany();
+    res.json(links);
   } catch (error) {
-    console.error("Error al crear y asociar enlace:", error);
-    res.status(500).json({ error: "Error al crear y asociar enlace" });
+    console.error('Error al recuperar los enlaces:', error);
+    res.status(500).json({ error: 'Error al recuperar enlaces' });
   }
 });
 
-router.get('/courseLink', async (_req,res) => {
-  try{
-      const links = await prisma.link.findMany();
-      res.json(links);
-  }catch (error){
-      console.error('Error al recuperar los links:', error);
-  res.status(500).json({ error: 'Error al recuperar links' });
-  }
-});
 
-router.get("/courseLink/:courseId", async (req, res) => {
+router.get("/link/:courseId", async (req, res) => {
   try {
     const { courseId } = req.params;
 
@@ -97,19 +58,23 @@ router.get("/courseLink/:courseId", async (req, res) => {
       return res.status(400).json({ error: "ID de curso no proporcionado" });
     }
 
-    const courseLinks = await prisma.courseLink.findMany({
+    const course = await prisma.course.findUnique({
       where: {
-        courseId: parseInt(courseId, 10),
+        id: parseInt(courseId, 10),
       },
-      include: {
+      select: {
         link: true,
       },
     });
 
-    res.json(courseLinks);
+    if (!course) {
+      return res.status(404).json({ error: "Curso no encontrado" });
+    }
+
+    res.json({ link: course.link });
   } catch (error) {
-    console.error("Error al recuperar los enlaces del curso:", error);
-    res.status(500).json({ error: "Error al recuperar enlaces del curso" });
+    console.error("Error al recuperar el enlace del curso:", error);
+    res.status(500).json({ error: "Error al recuperar el enlace del curso" });
   }
 });
 

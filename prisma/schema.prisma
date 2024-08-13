@@ -17,10 +17,10 @@ model User {
   startDate DateTime  @default(now())
   status    String    @default("Active")
   linkImage String
-  email       String    @unique
-  location    String
-  university  String
-  position    String
+  email     String    @unique
+  location  String
+  university String
+  position  String
   plans     Plan[]
   skills    UserSkill[]
 }
@@ -30,39 +30,9 @@ model Course {
   name        String
   description String?
   duration    Float?
-  categories  CourseCategory[]
-  links       CourseLink[]
-  plans       Plan[]
-}
-
-model Category {
-  id                Int             @id @default(autoincrement())
-  name              String
-  courseCategories  CourseCategory[]
-}
-
-model CourseCategory {
-  courseId   Int
-  categoryId Int
-  course     Course   @relation(fields: [courseId], references: [id])
-  category   Category @relation(fields: [categoryId], references: [id])
-
-  @@id([courseId, categoryId])
-}
-
-model CourseLink {
-  courseId Int
-  linkId   Int
-  course   Course @relation(fields: [courseId], references: [id])
-  link     Link   @relation(fields: [linkId], references: [id])
-
-  @@id([courseId, linkId])
-}
-
-model Link {
-  id          Int      @id @default(autoincrement())
-  description String
-  courseLinks CourseLink[]
+  link        String?  
+  category    String?  
+  plans       Plan[]  
 }
 
 model Plan {
